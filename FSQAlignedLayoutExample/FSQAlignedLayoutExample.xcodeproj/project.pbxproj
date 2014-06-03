@@ -1,0 +1,319 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F16BB6271922E39800A43521 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F16BB6261922E39800A43521 /* Foundation.framework */; };
+		F16BB6291922E39800A43521 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F16BB6281922E39800A43521 /* CoreGraphics.framework */; };
+		F16BB62B1922E39800A43521 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F16BB62A1922E39800A43521 /* UIKit.framework */; };
+		F16BB6311922E39800A43521 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = F16BB62F1922E39800A43521 /* InfoPlist.strings */; };
+		F16BB6331922E39800A43521 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = F16BB6321922E39800A43521 /* main.m */; };
+		F16BB6371922E39800A43521 /* FSQAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = F16BB6361922E39800A43521 /* FSQAppDelegate.m */; };
+		F16BB6391922E39800A43521 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F16BB6381922E39800A43521 /* Images.xcassets */; };
+		F16BB6571922E74700A43521 /* FSQAlignedIndentExampleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F16BB6561922E74700A43521 /* FSQAlignedIndentExampleViewController.m */; };
+		F16BB65A1922E76E00A43521 /* FSQCollectionViewAlignedLayout.m in Sources */ = {isa = PBXBuildFile; fileRef = F16BB6591922E76E00A43521 /* FSQCollectionViewAlignedLayout.m */; };
+		F190C71B192406C5003BCAD2 /* FSQAlignmentExampleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F190C71A192406C5003BCAD2 /* FSQAlignmentExampleViewController.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		F16BB6231922E39800A43521 /* FSQAlignedLayoutExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FSQAlignedLayoutExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F16BB6261922E39800A43521 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		F16BB6281922E39800A43521 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		F16BB62A1922E39800A43521 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		F16BB62E1922E39800A43521 /* FSQAlignedLayoutExample-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FSQAlignedLayoutExample-Info.plist"; sourceTree = "<group>"; };
+		F16BB6301922E39800A43521 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		F16BB6321922E39800A43521 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		F16BB6341922E39800A43521 /* FSQAlignedLayoutExample-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "FSQAlignedLayoutExample-Prefix.pch"; sourceTree = "<group>"; };
+		F16BB6351922E39800A43521 /* FSQAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FSQAppDelegate.h; sourceTree = "<group>"; };
+		F16BB6361922E39800A43521 /* FSQAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FSQAppDelegate.m; sourceTree = "<group>"; };
+		F16BB6381922E39800A43521 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		F16BB63F1922E39800A43521 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		F16BB6551922E74700A43521 /* FSQAlignedIndentExampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSQAlignedIndentExampleViewController.h; sourceTree = "<group>"; };
+		F16BB6561922E74700A43521 /* FSQAlignedIndentExampleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSQAlignedIndentExampleViewController.m; sourceTree = "<group>"; };
+		F16BB6581922E76E00A43521 /* FSQCollectionViewAlignedLayout.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FSQCollectionViewAlignedLayout.h; path = ../../FSQCollectionViewAlignedLayout.h; sourceTree = "<group>"; };
+		F16BB6591922E76E00A43521 /* FSQCollectionViewAlignedLayout.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = FSQCollectionViewAlignedLayout.m; path = ../../FSQCollectionViewAlignedLayout.m; sourceTree = "<group>"; };
+		F190C719192406C5003BCAD2 /* FSQAlignmentExampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FSQAlignmentExampleViewController.h; sourceTree = "<group>"; };
+		F190C71A192406C5003BCAD2 /* FSQAlignmentExampleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FSQAlignmentExampleViewController.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F16BB6201922E39800A43521 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F16BB6291922E39800A43521 /* CoreGraphics.framework in Frameworks */,
+				F16BB62B1922E39800A43521 /* UIKit.framework in Frameworks */,
+				F16BB6271922E39800A43521 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F16BB61A1922E39800A43521 = {
+			isa = PBXGroup;
+			children = (
+				F16BB62C1922E39800A43521 /* FSQAlignedLayoutExample */,
+				F16BB6251922E39800A43521 /* Frameworks */,
+				F16BB6241922E39800A43521 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F16BB6241922E39800A43521 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F16BB6231922E39800A43521 /* FSQAlignedLayoutExample.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		F16BB6251922E39800A43521 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F16BB6261922E39800A43521 /* Foundation.framework */,
+				F16BB6281922E39800A43521 /* CoreGraphics.framework */,
+				F16BB62A1922E39800A43521 /* UIKit.framework */,
+				F16BB63F1922E39800A43521 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		F16BB62C1922E39800A43521 /* FSQAlignedLayoutExample */ = {
+			isa = PBXGroup;
+			children = (
+				F16BB6351922E39800A43521 /* FSQAppDelegate.h */,
+				F16BB6361922E39800A43521 /* FSQAppDelegate.m */,
+				F190C719192406C5003BCAD2 /* FSQAlignmentExampleViewController.h */,
+				F190C71A192406C5003BCAD2 /* FSQAlignmentExampleViewController.m */,
+				F16BB6551922E74700A43521 /* FSQAlignedIndentExampleViewController.h */,
+				F16BB6561922E74700A43521 /* FSQAlignedIndentExampleViewController.m */,
+				F16BB6581922E76E00A43521 /* FSQCollectionViewAlignedLayout.h */,
+				F16BB6591922E76E00A43521 /* FSQCollectionViewAlignedLayout.m */,
+				F16BB6381922E39800A43521 /* Images.xcassets */,
+				F16BB62D1922E39800A43521 /* Supporting Files */,
+			);
+			path = FSQAlignedLayoutExample;
+			sourceTree = "<group>";
+		};
+		F16BB62D1922E39800A43521 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				F16BB62E1922E39800A43521 /* FSQAlignedLayoutExample-Info.plist */,
+				F16BB62F1922E39800A43521 /* InfoPlist.strings */,
+				F16BB6321922E39800A43521 /* main.m */,
+				F16BB6341922E39800A43521 /* FSQAlignedLayoutExample-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F16BB6221922E39800A43521 /* FSQAlignedLayoutExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F16BB64F1922E39800A43521 /* Build configuration list for PBXNativeTarget "FSQAlignedLayoutExample" */;
+			buildPhases = (
+				F16BB61F1922E39800A43521 /* Sources */,
+				F16BB6201922E39800A43521 /* Frameworks */,
+				F16BB6211922E39800A43521 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FSQAlignedLayoutExample;
+			productName = FSQAlignedLayoutExample;
+			productReference = F16BB6231922E39800A43521 /* FSQAlignedLayoutExample.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F16BB61B1922E39800A43521 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				CLASSPREFIX = FSQ;
+				LastUpgradeCheck = 0510;
+				ORGANIZATIONNAME = Foursquare;
+			};
+			buildConfigurationList = F16BB61E1922E39800A43521 /* Build configuration list for PBXProject "FSQAlignedLayoutExample" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = F16BB61A1922E39800A43521;
+			productRefGroup = F16BB6241922E39800A43521 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F16BB6221922E39800A43521 /* FSQAlignedLayoutExample */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F16BB6211922E39800A43521 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F16BB6311922E39800A43521 /* InfoPlist.strings in Resources */,
+				F16BB6391922E39800A43521 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F16BB61F1922E39800A43521 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F16BB65A1922E76E00A43521 /* FSQCollectionViewAlignedLayout.m in Sources */,
+				F16BB6331922E39800A43521 /* main.m in Sources */,
+				F190C71B192406C5003BCAD2 /* FSQAlignmentExampleViewController.m in Sources */,
+				F16BB6571922E74700A43521 /* FSQAlignedIndentExampleViewController.m in Sources */,
+				F16BB6371922E39800A43521 /* FSQAppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		F16BB62F1922E39800A43521 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F16BB6301922E39800A43521 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		F16BB64D1922E39800A43521 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		F16BB64E1922E39800A43521 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F16BB6501922E39800A43521 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FSQAlignedLayoutExample/FSQAlignedLayoutExample-Prefix.pch";
+				INFOPLIST_FILE = "FSQAlignedLayoutExample/FSQAlignedLayoutExample-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		F16BB6511922E39800A43521 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "FSQAlignedLayoutExample/FSQAlignedLayoutExample-Prefix.pch";
+				INFOPLIST_FILE = "FSQAlignedLayoutExample/FSQAlignedLayoutExample-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F16BB61E1922E39800A43521 /* Build configuration list for PBXProject "FSQAlignedLayoutExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F16BB64D1922E39800A43521 /* Debug */,
+				F16BB64E1922E39800A43521 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F16BB64F1922E39800A43521 /* Build configuration list for PBXNativeTarget "FSQAlignedLayoutExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F16BB6501922E39800A43521 /* Debug */,
+				F16BB6511922E39800A43521 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F16BB61B1922E39800A43521 /* Project object */;
+}
