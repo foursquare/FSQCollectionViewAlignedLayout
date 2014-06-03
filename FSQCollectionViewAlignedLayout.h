@@ -7,7 +7,7 @@
 /**
  Overview:
  
- FSQCollectionViewAlignedLayout lays out collection views sort of like how a type setter would draw out a string,
+ FSQCollectionViewAlignedLayout lays out collection view cells sort of like how a type setter would draw out a string,
  but with collection cells instead of font glyphs. Each section can have both a vertical and horizontal alignment 
  (horizontal aligns each line relative to the whole section, vertical aligns the items within each line if they are 
  different heights). It also allows you to specify distance between items in each section and between lines.
