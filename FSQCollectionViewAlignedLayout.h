@@ -74,6 +74,11 @@
  */
 @property (nonatomic) UIEdgeInsets contentInsets;
 
+/*
+ Total content size of all sections.
+ */
+@property (nonatomic, readonly) CGSize totalContentSize;
+
 @end
 
 
