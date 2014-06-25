@@ -338,6 +338,15 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
     self.totalContentSize = totalSizeOfContent;
 }
 
+#pragma mark - Getters -
+
+- (CGSize)totalContentSize{
+  if(CGSizeEqualToSize(_totalContentSize, CGSizeZero)){
+    [self prepareLayout];
+  }
+  return _totalContentSize;
+}
+
 #pragma mark - Cells in Rect Calculations -
 
 /**
