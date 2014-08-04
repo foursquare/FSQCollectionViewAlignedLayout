@@ -2,7 +2,7 @@ Pod::Spec.new do |s|
   s.name      = 'FSQCollectionViewAlignedLayout'
   s.version   = '1.0.1'
   s.platform  = :ios
-  s.summary   = 'A centralized location manager for your app'
+  s.summary   = 'A simple, generic collection view layout with multiple customization options.'
   s.homepage  = 'https://github.com/foursquare/FSQCollectionViewAlignedLayout'
   s.license   = { :type => 'Apache', :file => 'LICENSE.txt' }
   s.authors   = { 'Brian Dorfman' => 'https://twitter.com/bdorfman' }             
