@@ -126,6 +126,8 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
         
         FSQCollectionViewAlignedLayoutSectionAttributes *sectionAttributes = [self attributesForSectionAtIndex:sectionIndex];
         
+        totalSizeOfContent.height += sectionAttributes.insets.top;
+        
         /*
          First we check if we need to finish the line we're currently working on by checking various states and the size of what we're adding
          Then if we have more things to add we add them (possibly on a new line depending on previous step)
@@ -324,7 +326,7 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
                                              totalSizeOfSection.width,
                                              totalSizeOfSection.height);
         [self.sectionsData addObject:sectionData];
-        totalSizeOfContent.height += totalSizeOfSection.height;
+        totalSizeOfContent.height += totalSizeOfSection.height + sectionAttributes.insets.bottom;
     }
     
     
