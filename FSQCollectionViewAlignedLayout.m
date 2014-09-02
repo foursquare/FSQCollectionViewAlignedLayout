@@ -466,7 +466,7 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
         // Just return everything!
         for (FSQCollectionViewAlignedLayoutSectionData *sectionData in self.sectionsData) {
             for (UICollectionViewLayoutAttributes *cellAttributes in sectionData) {
-                [matchingLayoutAttributes addObject:cellAttributes];
+                [matchingLayoutAttributes addObject:[cellAttributes copy]];
             }
         }
     }
@@ -479,7 +479,7 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
             
             for (UICollectionViewLayoutAttributes *cellAttributes in sectionData) {
                 if (CGRectIntersectsRect(targetRect, cellAttributes.frame)) {
-                    [matchingLayoutAttributes addObject:cellAttributes];
+                    [matchingLayoutAttributes addObject:[cellAttributes copy]];
                 }
             }
         }
@@ -493,7 +493,7 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
             
             for (UICollectionViewLayoutAttributes *cellAttributes in sectionData) {
                 if (CGRectIntersectsRect(targetRect, cellAttributes.frame)) {
-                    [matchingLayoutAttributes addObject:cellAttributes];
+                    [matchingLayoutAttributes addObject:[cellAttributes copy]];
                 }
             }
         }
@@ -507,17 +507,18 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
                 
                 for (UICollectionViewLayoutAttributes *cellAttributes in sectionData) {
                     if (CGRectIntersectsRect(cellAttributes.frame, targetRect)) {
-                        [matchingLayoutAttributes addObject:cellAttributes];
+                        [matchingLayoutAttributes addObject:[cellAttributes copy]];
                     }
                 }
             }];
         }
     }
+    
     return matchingLayoutAttributes;
 }
 
 - (UICollectionViewLayoutAttributes *)layoutAttributesForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return self[indexPath.section][indexPath.item];
+    return [self[indexPath.section][indexPath.item] copy];
 }
 
 - (CGSize)collectionViewContentSize {
