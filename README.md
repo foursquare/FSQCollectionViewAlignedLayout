@@ -85,11 +85,11 @@ If all your cells have the same attributes, you can set the `defaultCellAttribut
 The following cell attributes are available
 
 
-**UIEdgeInsets insets** — This is the spacing in points around all four edges of the cell. For layout positioning purposes, these insets are added to the cell's size. For example, a 50x50 point cell with 10 point insets on all four sides will be laid out as if it was a 60x60 point cell. However, the actual UICollectionViewCell class will end up being the correct size you reported it as being.
+**UIEdgeInsets insets** — This is the spacing in points around all four edges of the cell. For layout positioning purposes, these insets are added to the cell's size. For example, a 50x50 point cell with 5 point insets on all four sides will be laid out as if it was a 60x60 point cell. However, the actual UICollectionViewCell class will end up being the correct size you reported it as being.
 
-**BOOL shouldBeginLine** — If *YES*, this will force the cell to the first cell on the line if it would not otherwise have been laid out that way.
+**BOOL shouldBeginLine** — If *YES*, this will force the cell to be the first cell on the line if it would not otherwise have been laid out that way.
 
-**BOOL shouldEndLine** — If *YES*, this will force the cell to the last cell on the line if it would not otherwise have been laid out that way.
+**BOOL shouldEndLine** — If *YES*, this will force the cell to be the last cell on the line if it would not otherwise have been laid out that way.
 
 **BOOL startLineIndentation** — If *YES* and the section's alignment is *Left* or *Right*, this will force all future lines to line up with the left or right edge of this cell respectively. The available width of all future lines will be lowered and padding will be added to the appropriate side to inset them. The indentation starts at the actual edge of the cell, not including insets. There can be only one indentation at a time per section; a future cell in the same section with indentation will override a previous one.
 
@@ -121,7 +121,7 @@ If all your cells are the same size, you can set the `defaultCellSize` property 
       remainingLineSpace:(CGFloat)remainingLineSpace;
 ```
 
-This mirrors the sizing delegate method used by UICollectionViewDelegateFlowLayout, but with the addition of the `remainingLineSpace` parameter. This parameter contains the amount of horizontal space in points remaining on the current line that is being laid out. If you return a size whose width is less than or equal to remainingLineSpace it will therefore be laid out on the same line (barring any other cell attributes that might change this, such as insets or line breaks). This can be useful when you want to calculate a height based on width to fill up space on the rest of the line (e.g. for text or image sizing purposes).
+This mirrors the sizing delegate method used by UICollectionViewDelegateFlowLayout, but with the addition of the `remainingLineSpace` parameter. This parameter contains the amount of horizontal space in points remaining on the current line that is being laid out. If you return a size whose width is less than or equal to remainingLineSpace it will therefore be laid out on the same line (barring any other cell attributes that might change this, such as line breaks). This can be useful when you want to calculate a height based on width to fill up space on the rest of the line (e.g. for text or image sizing purposes).
 
 Top Level Properties
 ====================
