@@ -46,7 +46,7 @@
  
  Defaults to 100x100 cells if not set.
  */
-@property (nonatomic) CGSize defaultCellSize;
+@property (nonatomic) IBInspectable CGSize defaultCellSize;
 
 /** 
  Used if attributesForSectionAtIndex delegate method is not implemented
@@ -67,7 +67,7 @@
  
  Defaults to 10 if not set.
  */
-@property (nonatomic) CGFloat sectionSpacing;
+@property (nonatomic) IBInspectable CGFloat sectionSpacing;
 
 /** 
  Insets in points around the entire contents of the collection. Defaults to (5, 5, 5, 5) if not set

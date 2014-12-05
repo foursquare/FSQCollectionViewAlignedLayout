@@ -98,6 +98,13 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
     return self;
 }
 
+- (id)initWithCoder:(NSCoder *)aDecoder {
+    if ((self = [super initWithCoder:aDecoder])) {
+        [self setupDefaults];
+    }
+    return self;
+}
+
 - (void)setupDefaults {
     self.defaultSectionAttributes = [FSQCollectionViewAlignedLayoutSectionAttributes topLeftAlignment];
     self.defaultCellAttributes = [FSQCollectionViewAlignedLayoutCellAttributes defaultCellAttributes];
