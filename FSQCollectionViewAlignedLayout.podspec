@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name      = 'FSQCollectionViewAlignedLayout'
-  s.version   = '1.0.2'
+  s.version   = '1.0.3'
   s.platform  = :ios
   s.summary   = 'A simple, generic collection view layout with multiple customization options.'
   s.homepage  = 'https://github.com/foursquare/FSQCollectionViewAlignedLayout'
