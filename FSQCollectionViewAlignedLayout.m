@@ -19,7 +19,7 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
 /**
  The layout has an array of these section data objects which it generates in prepareLayout using the section and cell attributes objects/delegate methods
  
- These store the the bounding box of each section and the layout attributes of each cell in that section. 
+ These store the the bounding box of each section and the layout attributes of each cell in that section.
  These are used in layoutAttributesForElementsInRect and layoutAttributesForItemAtIndexPath to provide the location of each cell.
  
  Note that all the cell frames are stored relative to the origin of the entire collection view frame, and not relative to the section's frame.
@@ -84,7 +84,6 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
 - (void)setObject:(FSQCollectionViewAlignedLayoutSectionData *)sectionData atIndexedSubscript:(NSUInteger)index;
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(id __unsafe_unretained [])buffer count:(NSUInteger)len;
 @end
-
 
 @implementation FSQCollectionViewAlignedLayout
 

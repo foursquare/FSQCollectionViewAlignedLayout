@@ -8,11 +8,11 @@
  Overview:
  
  FSQCollectionViewAlignedLayout lays out collection view cells sort of like how a type setter would draw out a string,
- but with collection cells instead of font glyphs. Each section can have both a vertical and horizontal alignment 
- (horizontal aligns each line relative to the whole section, vertical aligns the items within each line if they are 
+ but with collection cells instead of font glyphs. Each section can have both a vertical and horizontal alignment
+ (horizontal aligns each line relative to the whole section, vertical aligns the items within each line if they are
  different heights). It also allows you to specify distance between items in each section and between lines.
  
- Each cell can have not only a size, but insets. You can also tell it to insert "line breaks" before or 
+ Each cell can have not only a size, but insets. You can also tell it to insert "line breaks" before or
  after each cell to get things to wrap how you want.
  
  You can set defaults for section and cell styles just like you can in Flow Layout. Or you can implement delegate methods:
@@ -23,7 +23,7 @@
  
  - (FSQCollectionViewAlignedLayoutCellAttributes*)collectionView:layout:attributesForCellAtIndexPath:
  
- To return cell layout information for the specified indexPath. 
+ To return cell layout information for the specified indexPath.
  
  - (CGSize)collectionView:layout:sizeForItemAtIndexPath:remainingLineSpace:
  
@@ -48,11 +48,11 @@
  */
 @property (nonatomic) IBInspectable CGSize defaultCellSize;
 
-/** 
+/**
  Used if attributesForSectionAtIndex delegate method is not implemented
  
  Defaults to [FSQCollectionViewAlignedLayoutSectionAttributes topLeftAlignment] if not set.
- */ 
+ */
 @property (nonatomic) FSQCollectionViewAlignedLayoutSectionAttributes *defaultSectionAttributes;
 
 /**
@@ -62,14 +62,14 @@
  */
 @property (nonatomic) FSQCollectionViewAlignedLayoutCellAttributes *defaultCellAttributes;
 
-/** 
+/**
  Space in points between the bottom most part of a section and the top most part of the next one.
  
  Defaults to 10 if not set.
  */
 @property (nonatomic) IBInspectable CGFloat sectionSpacing;
 
-/** 
+/**
  Insets in points around the entire contents of the collection. Defaults to (5, 5, 5, 5) if not set
  */
 @property (nonatomic) UIEdgeInsets contentInsets;
@@ -88,7 +88,7 @@
  @param indexPath            The index path of the item.
  @param remainingLineSpace   The amount of space in pts remaining on the line the layout is currently laying out.
  
- @return The size the cell should be. If you return a size whose width is less than or equal to @c remainingLineSpace 
+ @return The size the cell should be. If you return a size whose width is less than or equal to @c remainingLineSpace
  it will be laid out on the same lane.
  
  @note remainingLineSpace takes into account any insets that may exist for the current cell, subtracting the
@@ -223,16 +223,16 @@ typedef NS_ENUM(NSInteger, FSQCollectionViewVerticalAlignment) {
  */
 @interface FSQCollectionViewAlignedLayoutCellAttributes : NSObject
 
-/** 
- Insets will be added to size for layout purposes, but the collection cell will end up actually being the size reported 
+/**
+ Insets will be added to size for layout purposes, but the collection cell will end up actually being the size reported
  in either the sizeForItemAtIndexPath or the layout's defaultCellSize property.
  
- You can add more padding around cells with positive insets, 
+ You can add more padding around cells with positive insets,
  or effectively shrink cell/line spacing or make cells overlap by using negative insets.
  */
 @property (nonatomic, readonly) UIEdgeInsets insets;
 
-/** 
+/**
  If YES, ensures this cell is the first thing on the line by inserting a line break before if necessary
  
  If there was going to be a line break before anyway, this has no effect (does not insert an EXTRA newline)
@@ -249,20 +249,20 @@ typedef NS_ENUM(NSInteger, FSQCollectionViewVerticalAlignment) {
 /**
  If YES and section alignment is Left or Right, future lines will start from this cell's left or right edge respectively.
  
- The available width of all future lines will be lowered and padding will be added to the appropriate side to inset 
+ The available width of all future lines will be lowered and padding will be added to the appropriate side to inset
  future lines
  
- @note There is no way to stop indenting once you start it without creating a new section, although you can start a new 
+ @note There is no way to stop indenting once you start it without creating a new section, although you can start a new
  indentation from a different cell.
  
- @note The alignment is from the actual position of the cell, not including its insets. Therefore you can fake an 
+ @note The alignment is from the actual position of the cell, not including its insets. Therefore you can fake an
  "unindentation" by using negative insets and then starting a new indentation.
  */
 @property (nonatomic, readonly) BOOL startLineIndentation;
 
-/** 
- Reusable shared pointer to a simple cell attribute object. 
- Zero insets, no line breaks, no indentation. 
+/**
+ Reusable shared pointer to a simple cell attribute object.
+ Zero insets, no line breaks, no indentation.
  */
 + (FSQCollectionViewAlignedLayoutCellAttributes *)defaultCellAttributes;
 
