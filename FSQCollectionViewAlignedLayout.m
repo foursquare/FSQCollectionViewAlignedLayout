@@ -29,6 +29,8 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
 /// Bounding box for the section. Used in layoutAttributesForElementsInRect calculation
 @property (nonatomic) CGRect sectionRect;
 
+@property (nonatomic) UICollectionViewLayoutAttributes *headerAttributes;
+
 /// Array of FSQCollectionViewAlignedLayoutCellData for each cell (including frame). Passed to collection view in delegate methods.
 @property (nonatomic) NSMutableArray *cellsData;
 
@@ -67,6 +69,16 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
 
 @end
 
+@implementation FSQCollectionViewAlignedLayoutInvalidationContext
+
+- (instancetype)init {
+    if ((self = [super init])) {
+        self.invalidateAlignedLayoutAttributes = YES;
+    }
+    return self;
+}
+
+@end
 
 @interface FSQCollectionViewAlignedLayout()
 
@@ -115,235 +127,251 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
 #pragma mark - Layout calculation -
 
 - (void)prepareLayout {
+    [super prepareLayout];
+    
     CGSize totalSizeOfContent = CGSizeMake(CGRectGetWidth(self.collectionView.frame), self.contentInsets.top);
-    const CGFloat maxCollectionViewWidth = totalSizeOfContent.width - UIEdgeInsetsHorizontalInset_fsq(self.contentInsets);
     
-    NSUInteger numberOfSections = self.collectionView.numberOfSections;
-    self.sectionsData = [NSMutableArray arrayWithCapacity:numberOfSections];
-    
-    for (NSUInteger sectionIndex = 0; sectionIndex < numberOfSections; sectionIndex++) {
-        if (sectionIndex > 0) {
-            totalSizeOfContent.height += self.sectionSpacing;
-        }
+    if (self.sectionsData == nil || self.totalContentSize.width != totalSizeOfContent.width) {
+        const CGFloat maxCollectionViewWidth = totalSizeOfContent.width - UIEdgeInsetsHorizontalInset_fsq(self.contentInsets);
+        NSUInteger numberOfSections = self.collectionView.numberOfSections;
         
-        NSUInteger numberOfCellsInSection = [self.collectionView numberOfItemsInSection:sectionIndex];
+        self.sectionsData = (numberOfSections > 0) ? [NSMutableArray arrayWithCapacity:numberOfSections] : nil;
         
-        FSQCollectionViewAlignedLayoutSectionData *sectionData = [[FSQCollectionViewAlignedLayoutSectionData alloc] initWithCapacity:numberOfCellsInSection];
-        
-        FSQCollectionViewAlignedLayoutSectionAttributes *sectionAttributes = [self attributesForSectionAtIndex:sectionIndex];
-        
-        totalSizeOfContent.height += sectionAttributes.insets.top;
-        
-        /*
-         First we check if we need to finish the line we're currently working on by checking various states and the size of what we're adding
-         Then if we have more things to add we add them (possibly on a new line depending on previous step)
-         
-         As we add things we store their rects relative to the origin point of the current line.
-         When we finish the line we calculate its total size and align/position it properly relative to collection view origin,
-         then we go back and move all the cell origins on that line to be relative to the collection view origin.
-         
-         We do the for loop one more time than the actual number of cells. 
-         On the last loop we simply finish off the current line if necessary and do not actually add anything.
-         */
-        CGFloat maxLineWidth = maxCollectionViewWidth - UIEdgeInsetsHorizontalInset_fsq(sectionAttributes.insets);
-        CGFloat remainingLineWidth = maxLineWidth;
-        NSUInteger startOfLineIndex = 0;
-        CGSize totalSizeOfLine = CGSizeMake(0, 0);
-        CGSize totalSizeOfSection = CGSizeMake(0, 0);
-        CGFloat leftEdgeOfSection = remainingLineWidth;
-        NSNumber *lineIndentationIndex = nil;
-        CGFloat lineIndentation = 0;
-        
-        BOOL insertLineBreak = NO;
-        for (NSUInteger cellIndex = 0; cellIndex < numberOfCellsInSection + 1; cellIndex++) {
-            NSIndexPath *indexPath = nil;
-            FSQCollectionViewAlignedLayoutCellAttributes *cellAttributes = nil;
-            CGSize cellSize = CGSizeZero;
-            CGFloat widthToBeAdded = 0;
-            BOOL validHorizontalCellToCellAlignment = NO;
-            
-            BOOL finishCurrentLine = NO;
-            BOOL gotCellSize = NO;
-            if (cellIndex >= numberOfCellsInSection) {
-                finishCurrentLine = YES;
-                gotCellSize = YES;
-            }
-            else {
-                indexPath = [NSIndexPath indexPathForItem:cellIndex inSection:sectionIndex];
-                cellAttributes = [self attributesForCellAtIndexPath:indexPath];
-                CGFloat cellHorizontalInsets = UIEdgeInsetsHorizontalInset_fsq(cellAttributes.insets);
-                
-                if (cellIndex != startOfLineIndex 
-                    && (insertLineBreak 
-                        || cellAttributes.shouldBeginLine
-                        || cellHorizontalInsets > remainingLineWidth)) {
-                        // this needs to go on a new line
-                        // finish off the current line first
-                        finishCurrentLine = YES;
-                }
+        for (NSUInteger sectionIndex = 0; sectionIndex < numberOfSections; sectionIndex++) {
+            if (sectionIndex > 0) {
+                totalSizeOfContent.height += self.sectionSpacing;
             }
             
+            NSUInteger numberOfCellsInSection = [self.collectionView numberOfItemsInSection:sectionIndex];
             
+            FSQCollectionViewAlignedLayoutSectionData *sectionData = [[FSQCollectionViewAlignedLayoutSectionData alloc] initWithCapacity:numberOfCellsInSection];
             
-            // May need to end the current line both before and after asking for size
-            // Loop it until both scenarios are accounted for
+            FSQCollectionViewAlignedLayoutSectionAttributes *sectionAttributes = [self attributesForSectionAtIndex:sectionIndex];
             
-            while (!gotCellSize || finishCurrentLine) {
-                if (finishCurrentLine) {
-                    totalSizeOfLine.width = maxLineWidth - remainingLineWidth;
-                    if (startOfLineIndex > 0) {
-                        totalSizeOfSection.height += sectionAttributes.lineSpacing;
-                    }
-                    
-                    // Need to get the frame before we adjust everything, but dont actually change things until we reset for the next line
-                    if (lineIndentationIndex != nil) {
-                        // Temporarily reuse this NSNumber to mean a different thing because we can't actually change lineIndentation yet
-                        if (sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentLeft) {
-                            lineIndentationIndex = @(CGRectGetMinX(sectionData[[lineIndentationIndex unsignedIntegerValue]].frame));
-                        }
-                        else if (sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentRight) {
-                            lineIndentationIndex = @(totalSizeOfLine.width - CGRectGetMaxX(sectionData[[lineIndentationIndex unsignedIntegerValue]].frame));
-                        }
-                    }
-                    
-                    CGRect lineFrame = CGRectMake(self.contentInsets.left + sectionAttributes.insets.left, 
-                                                  totalSizeOfSection.height + totalSizeOfContent.height, 
-                                                  totalSizeOfLine.width, 
-                                                  totalSizeOfLine.height);
-                    switch (sectionAttributes.horizontalAlignment) {
-                        case FSQCollectionViewHorizontalAlignmentRight:
-                            lineFrame.origin.x += remainingLineWidth;
-                            break;
-                        case FSQCollectionViewHorizontalAlignmentCenter:
-                            lineFrame.origin.x += remainingLineWidth / 2.;
-                            break;
-                        case FSQCollectionViewHorizontalAlignmentLeft:
-                            lineFrame.origin.x += lineIndentation;
-                            break;
-                        default:
-                            NSAssert(0, @"FSQCollectionViewAlignedLayout: Unexpected value (%ld) for section (%lu) horizontal alignment", (long)sectionAttributes.horizontalAlignment, (unsigned long)sectionIndex);
-                            break;
-                    }
-                    
-                    // Ok we figured out where the line is in our view. Now go back and update the line's cell attributes so their frames are correct
-                    for (NSUInteger cellOnThisLineIndex = startOfLineIndex; cellOnThisLineIndex < cellIndex; cellOnThisLineIndex++) {
-                        CGRect cellFrame = sectionData[cellOnThisLineIndex].frame;
-                        cellFrame.origin.x += CGRectGetMinX(lineFrame);
-                        cellFrame.origin.y += CGRectGetMinY(lineFrame);
-                        switch (sectionAttributes.verticalAlignment) {
-                            case FSQCollectionViewVerticalAlignmentBottom:
-                                cellFrame.origin.y += (totalSizeOfLine.height - CGRectGetHeight(cellFrame));
-                                break;
-                            case FSQCollectionViewVerticalAlignmentCenter:
-                                cellFrame.origin.y += (totalSizeOfLine.height - CGRectGetHeight(cellFrame)) / 2.;
-                                break;
-                            case FSQCollectionViewVerticalAlignmentTop:
-                                // It's already aligned top. Do nothing
-                                break;
-                            default:
-                                NSAssert(0, @"FSQCollectionViewAlignedLayout: Unexpected value (%ld) for section (%lu) vertical alignment", (long)sectionAttributes.verticalAlignment, (unsigned long)sectionIndex);
-                                break;
-                        }
-                        sectionData[cellOnThisLineIndex].frame = cellFrame;
-                    }
-                    
-                    if (CGRectGetWidth(lineFrame) > totalSizeOfSection.width) {
-                        totalSizeOfSection.width = CGRectGetWidth(lineFrame);
-                    }
-                    
-                    if (CGRectGetMinX(lineFrame) < leftEdgeOfSection) {
-                        leftEdgeOfSection = CGRectGetMinX(lineFrame);
-                    }
-                    
-                    // Start a new line
-                    if (lineIndentationIndex != nil) {
-                        lineIndentation = [lineIndentationIndex doubleValue];
-                        maxLineWidth -= lineIndentation;
-                        lineIndentationIndex = nil;
-                    }
-                    
-                    startOfLineIndex = cellIndex;
-                    remainingLineWidth = maxLineWidth;
-                    totalSizeOfSection.height += totalSizeOfLine.height;
-                    totalSizeOfLine = CGSizeMake(0, 0);
-                    finishCurrentLine = NO;
-                }
+            /*
+             First we check if we need to finish the line we're currently working on by checking various states and the size of what we're adding
+             Then if we have more things to add we add them (possibly on a new line depending on previous step)
+             
+             As we add things we store their rects relative to the origin point of the current line.
+             When we finish the line we calculate its total size and align/position it properly relative to collection view origin,
+             then we go back and move all the cell origins on that line to be relative to the collection view origin.
+             
+             We do the for loop one more time than the actual number of cells.
+             On the last loop we simply finish off the current line if necessary and do not actually add anything.
+             */
+            CGFloat maxLineWidth = maxCollectionViewWidth - UIEdgeInsetsHorizontalInset_fsq(sectionAttributes.insets);
+            CGFloat remainingLineWidth = maxLineWidth;
+            NSUInteger startOfLineIndex = 0;
+            CGSize totalSizeOfLine = CGSizeMake(0, 0);
+            CGSize totalSizeOfSection = CGSizeMake(0, 0);
+            CGFloat leftEdgeOfSection = remainingLineWidth;
+            NSNumber *lineIndentationIndex = nil;
+            CGFloat lineIndentation = 0;
+            
+            CGFloat headerHeight = [self heightForHeaderInSection:sectionIndex];
+            if (headerHeight > 0.0f) {
+                NSIndexPath *indexPath = [NSIndexPath indexPathForItem:0 inSection:sectionIndex];
+                UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:indexPath];
+                attributes.frame = CGRectMake(0.0f, totalSizeOfContent.height, totalSizeOfContent.width, headerHeight);
+                sectionData.headerAttributes = attributes;
+                totalSizeOfSection.height += headerHeight;
+            }
+            
+            totalSizeOfSection.height += sectionAttributes.insets.top;
+            
+            BOOL insertLineBreak = NO;
+            for (NSUInteger cellIndex = 0; cellIndex < numberOfCellsInSection + 1; cellIndex++) {
+                NSIndexPath *indexPath = nil;
+                FSQCollectionViewAlignedLayoutCellAttributes *cellAttributes = nil;
+                CGSize cellSize = CGSizeZero;
+                CGFloat widthToBeAdded = 0;
+                BOOL validHorizontalCellToCellAlignment = NO;
                 
-                if (!gotCellSize) {
-                    // If previous line needed to be ended, that is done now
-                    // We can now safely ask for cell size and remainingLineSpace will be correct
-
-                    CGFloat lineWidthToReport = (cellIndex > startOfLineIndex) ? (remainingLineWidth - sectionAttributes.itemSpacing) : remainingLineWidth;
-                    CGFloat cellHorizontalInsets = UIEdgeInsetsHorizontalInset_fsq(cellAttributes.insets);
-                    lineWidthToReport -= cellHorizontalInsets;
-                    cellSize = [self sizeForCellAtIndexPath:indexPath remainingLineSpace:lineWidthToReport];
+                BOOL finishCurrentLine = NO;
+                BOOL gotCellSize = NO;
+                if (cellIndex >= numberOfCellsInSection) {
+                    finishCurrentLine = YES;
                     gotCellSize = YES;
-                    widthToBeAdded = (cellSize.width + cellHorizontalInsets);
-                    
-                    if (cellIndex > startOfLineIndex) {
-                        widthToBeAdded += sectionAttributes.itemSpacing;
-                    }
+                }
+                else {
+                    indexPath = [NSIndexPath indexPathForItem:cellIndex inSection:sectionIndex];
+                    cellAttributes = [self attributesForCellAtIndexPath:indexPath];
+                    CGFloat cellHorizontalInsets = UIEdgeInsetsHorizontalInset_fsq(cellAttributes.insets);
                     
                     if (cellIndex != startOfLineIndex
-                        && (widthToBeAdded > remainingLineWidth)) {
+                        && (insertLineBreak
+                            || cellAttributes.shouldBeginLine
+                            || cellHorizontalInsets > remainingLineWidth)) {
                             // this needs to go on a new line
                             // finish off the current line first
                             finishCurrentLine = YES;
-                    }
+                        }
                 }
                 
+                
+                
+                // May need to end the current line both before and after asking for size
+                // Loop it until both scenarios are accounted for
+                
+                while (!gotCellSize || finishCurrentLine) {
+                    if (finishCurrentLine) {
+                        totalSizeOfLine.width = maxLineWidth - remainingLineWidth;
+                        if (startOfLineIndex > 0) {
+                            totalSizeOfSection.height += sectionAttributes.lineSpacing;
+                        }
+                        
+                        // Need to get the frame before we adjust everything, but dont actually change things until we reset for the next line
+                        if (lineIndentationIndex != nil) {
+                            // Temporarily reuse this NSNumber to mean a different thing because we can't actually change lineIndentation yet
+                            if (sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentLeft) {
+                                lineIndentationIndex = @(CGRectGetMinX(sectionData[[lineIndentationIndex unsignedIntegerValue]].frame));
+                            }
+                            else if (sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentRight) {
+                                lineIndentationIndex = @(totalSizeOfLine.width - CGRectGetMaxX(sectionData[[lineIndentationIndex unsignedIntegerValue]].frame));
+                            }
+                        }
+                        
+                        CGRect lineFrame = CGRectMake(self.contentInsets.left + sectionAttributes.insets.left,
+                                                      totalSizeOfSection.height + totalSizeOfContent.height,
+                                                      totalSizeOfLine.width,
+                                                      totalSizeOfLine.height);
+                        switch (sectionAttributes.horizontalAlignment) {
+                            case FSQCollectionViewHorizontalAlignmentRight:
+                                lineFrame.origin.x += remainingLineWidth;
+                                break;
+                            case FSQCollectionViewHorizontalAlignmentCenter:
+                                lineFrame.origin.x += floorf(remainingLineWidth / 2.);
+                                break;
+                            case FSQCollectionViewHorizontalAlignmentLeft:
+                                lineFrame.origin.x += lineIndentation;
+                                break;
+                            default:
+                                NSAssert(0, @"FSQCollectionViewAlignedLayout: Unexpected value (%ld) for section (%lu) horizontal alignment", (long)sectionAttributes.horizontalAlignment, (unsigned long)sectionIndex);
+                                break;
+                        }
+                        
+                        // Ok we figured out where the line is in our view. Now go back and update the line's cell attributes so their frames are correct
+                        for (NSUInteger cellOnThisLineIndex = startOfLineIndex; cellOnThisLineIndex < cellIndex; cellOnThisLineIndex++) {
+                            CGRect cellFrame = sectionData[cellOnThisLineIndex].frame;
+                            cellFrame.origin.x += CGRectGetMinX(lineFrame);
+                            cellFrame.origin.y += CGRectGetMinY(lineFrame);
+                            switch (sectionAttributes.verticalAlignment) {
+                                case FSQCollectionViewVerticalAlignmentBottom:
+                                    cellFrame.origin.y += (totalSizeOfLine.height - CGRectGetHeight(cellFrame));
+                                    break;
+                                case FSQCollectionViewVerticalAlignmentCenter:
+                                    cellFrame.origin.y += (totalSizeOfLine.height - CGRectGetHeight(cellFrame)) / 2.;
+                                    break;
+                                case FSQCollectionViewVerticalAlignmentTop:
+                                    // It's already aligned top. Do nothing
+                                    break;
+                                default:
+                                    NSAssert(0, @"FSQCollectionViewAlignedLayout: Unexpected value (%ld) for section (%lu) vertical alignment", (long)sectionAttributes.verticalAlignment, (unsigned long)sectionIndex);
+                                    break;
+                            }
+                            sectionData[cellOnThisLineIndex].frame = cellFrame;
+                        }
+                        
+                        if (CGRectGetWidth(lineFrame) > totalSizeOfSection.width) {
+                            totalSizeOfSection.width = CGRectGetWidth(lineFrame);
+                        }
+                        
+                        if (CGRectGetMinX(lineFrame) < leftEdgeOfSection) {
+                            leftEdgeOfSection = CGRectGetMinX(lineFrame);
+                        }
+                        
+                        // Start a new line
+                        if (lineIndentationIndex != nil) {
+                            lineIndentation = [lineIndentationIndex doubleValue];
+                            maxLineWidth -= lineIndentation;
+                            lineIndentationIndex = nil;
+                        }
+                        
+                        startOfLineIndex = cellIndex;
+                        remainingLineWidth = maxLineWidth;
+                        totalSizeOfSection.height += totalSizeOfLine.height;
+                        totalSizeOfLine = CGSizeMake(0, 0);
+                        finishCurrentLine = NO;
+                    }
+                    
+                    if (!gotCellSize) {
+                        // If previous line needed to be ended, that is done now
+                        // We can now safely ask for cell size and remainingLineSpace will be correct
+                        
+                        CGFloat lineWidthToReport = (cellIndex > startOfLineIndex) ? (remainingLineWidth - sectionAttributes.itemSpacing) : remainingLineWidth;
+                        CGFloat cellHorizontalInsets = UIEdgeInsetsHorizontalInset_fsq(cellAttributes.insets);
+                        lineWidthToReport -= cellHorizontalInsets;
+                        cellSize = [self sizeForCellAtIndexPath:indexPath remainingLineSpace:lineWidthToReport];
+                        gotCellSize = YES;
+                        widthToBeAdded = (cellSize.width + cellHorizontalInsets);
+                        
+                        if (cellIndex > startOfLineIndex) {
+                            widthToBeAdded += sectionAttributes.itemSpacing;
+                        }
+                        
+                        if (cellIndex != startOfLineIndex
+                            && (widthToBeAdded > remainingLineWidth)) {
+                            // this needs to go on a new line
+                            // finish off the current line first
+                            finishCurrentLine = YES;
+                        }
+                    }
+                    
+                }
+                
+                if (cellAttributes) {
+                    // Add to this line!
+                    UIEdgeInsets cellInsets = cellAttributes.insets;
+                    
+                    CGRect layoutRectRelativeToLineOrigin = CGRectMake((maxLineWidth - remainingLineWidth),
+                                                                       0,
+                                                                       cellSize.width  + UIEdgeInsetsHorizontalInset_fsq(cellAttributes.insets),
+                                                                       cellSize.height + UIEdgeInsetsVerticalInset_fsq(cellAttributes.insets));
+                    
+                    if (startOfLineIndex != cellIndex) {
+                        layoutRectRelativeToLineOrigin.origin.x += sectionAttributes.itemSpacing;
+                    }
+                    
+                    
+                    UICollectionViewLayoutAttributes *itemAttributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
+                    itemAttributes.frame =  UIEdgeInsetsInsetRect(layoutRectRelativeToLineOrigin, cellAttributes.insets);
+                    
+                    
+                    if (cellAttributes.startLineIndentation
+                        && (sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentLeft
+                            || sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentRight)) {
+                            lineIndentationIndex = @(cellIndex);
+                        }
+                    
+                    [sectionData.cellsData addObject:itemAttributes];
+                    if (CGRectGetHeight(layoutRectRelativeToLineOrigin) > totalSizeOfLine.height) {
+                        totalSizeOfLine.height = cellSize.height + UIEdgeInsetsVerticalInset_fsq(cellInsets);
+                    }
+                    
+                    remainingLineWidth = maxLineWidth - CGRectGetMaxX(layoutRectRelativeToLineOrigin);
+                    insertLineBreak = cellAttributes.shouldEndLine || (validHorizontalCellToCellAlignment && sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentRight);
+                }
             }
             
-            if (cellAttributes) {
-                // Add to this line!
-                UIEdgeInsets cellInsets = cellAttributes.insets;
-                
-                CGRect layoutRectRelativeToLineOrigin = CGRectMake((maxLineWidth - remainingLineWidth),
-                                                                   0,
-                                                                   cellSize.width  + UIEdgeInsetsHorizontalInset_fsq(cellAttributes.insets),
-                                                                   cellSize.height + UIEdgeInsetsVerticalInset_fsq(cellAttributes.insets));
-                
-                if (startOfLineIndex != cellIndex) {
-                    layoutRectRelativeToLineOrigin.origin.x += sectionAttributes.itemSpacing;
-                }
-                
-                
-                UICollectionViewLayoutAttributes *itemAttributes = [UICollectionViewLayoutAttributes layoutAttributesForCellWithIndexPath:indexPath];
-                itemAttributes.frame =  UIEdgeInsetsInsetRect(layoutRectRelativeToLineOrigin, cellAttributes.insets);
-                
-                
-                if (cellAttributes.startLineIndentation
-                    && (sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentLeft
-                        || sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentRight)) {
-                        lineIndentationIndex = @(cellIndex);
-                    }
-                
-                [sectionData.cellsData addObject:itemAttributes];
-                if (CGRectGetHeight(layoutRectRelativeToLineOrigin) > totalSizeOfLine.height) {
-                    totalSizeOfLine.height = cellSize.height + UIEdgeInsetsVerticalInset_fsq(cellInsets);
-                }
-                
-                remainingLineWidth = maxLineWidth - CGRectGetMaxX(layoutRectRelativeToLineOrigin);
-                insertLineBreak = cellAttributes.shouldEndLine || (validHorizontalCellToCellAlignment && sectionAttributes.horizontalAlignment == FSQCollectionViewHorizontalAlignmentRight);
-            }
+            totalSizeOfSection.height += sectionAttributes.insets.bottom;
+            
+            sectionData.sectionRect = CGRectMake(leftEdgeOfSection,
+                                                 totalSizeOfContent.height,
+                                                 totalSizeOfSection.width,
+                                                 totalSizeOfSection.height);
+            [self.sectionsData addObject:sectionData];
+            totalSizeOfContent.height += totalSizeOfSection.height;
         }
-        sectionData.sectionRect = CGRectMake(leftEdgeOfSection, 
-                                             totalSizeOfContent.height, 
-                                             totalSizeOfSection.width,
-                                             totalSizeOfSection.height);
-        [self.sectionsData addObject:sectionData];
-        totalSizeOfContent.height += totalSizeOfSection.height + sectionAttributes.insets.bottom;
+        
+        if (totalSizeOfContent.height == self.contentInsets.top) {
+            totalSizeOfContent.height = 0;
+        }
+        else {
+            totalSizeOfContent.height += self.contentInsets.bottom;
+        }
+        
+        self.totalContentSize = totalSizeOfContent;
     }
-    
-    
-    if (totalSizeOfContent.height == self.contentInsets.top) {
-        totalSizeOfContent.height = 0;
-    }
-    else {
-        totalSizeOfContent.height += self.contentInsets.bottom;
-    }
-    
-    self.totalContentSize = totalSizeOfContent;
 }
 
 #pragma mark - Cells in Rect Calculations -
@@ -520,6 +548,18 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
         }
     }
     
+    NSIndexPath *firstIndexPath = [[matchingLayoutAttributes firstObject] indexPath];
+    NSIndexPath *lastIndexPath = [[matchingLayoutAttributes lastObject] indexPath];
+    
+    if (firstIndexPath && lastIndexPath) {
+        for (NSInteger section = firstIndexPath.section; section <= lastIndexPath.section; ++section) {
+            UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
+            if (attributes) {
+                [matchingLayoutAttributes addObject:attributes];
+            }
+        }
+    }
+    
     return matchingLayoutAttributes;
 }
 
@@ -527,8 +567,58 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
     return [self[indexPath.section][indexPath.item] copy];
 }
 
+- (UICollectionViewLayoutAttributes *)layoutAttributesForSupplementaryViewOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
+    UICollectionViewLayoutAttributes *attributes = nil;
+    if ([kind isEqualToString:UICollectionElementKindSectionHeader]) {
+        FSQCollectionViewAlignedLayoutSectionData *sectionData = self.sectionsData[indexPath.section];
+        if (sectionData.headerAttributes) {
+            attributes = [sectionData.headerAttributes copy];
+            
+            NSInteger section = indexPath.section;
+            NSInteger numberOfItemsInSection = [self.collectionView numberOfItemsInSection:section];
+            
+            NSIndexPath *firstCellIndexPath = [NSIndexPath indexPathForItem:0 inSection:section];
+            NSIndexPath *lastCellIndexPath = [NSIndexPath indexPathForItem:MAX(0, (numberOfItemsInSection - 1)) inSection:section];
+            
+            UICollectionViewLayoutAttributes *firstCellAttributes = [self layoutAttributesForItemAtIndexPath:firstCellIndexPath];
+            UICollectionViewLayoutAttributes *lastCellAttributes = [self layoutAttributesForItemAtIndexPath:lastCellIndexPath];
+            
+            CGFloat headerHeight = attributes.frame.size.height;
+            CGFloat minY = CGRectGetMinY(firstCellAttributes.frame) - headerHeight - self.contentInsets.top - self.defaultSectionAttributes.insets.top;
+            CGFloat maxY = CGRectGetMaxY(lastCellAttributes.frame) - headerHeight + self.contentInsets.bottom + self.defaultSectionAttributes.insets.bottom;
+            CGFloat yOffset = MIN(MAX(self.collectionView.contentOffset.y + self.collectionView.contentInset.top, minY), maxY);
+            attributes.frame = CGRectMake(0.0f, yOffset, self.collectionViewContentSize.width, headerHeight);
+            attributes.zIndex = NSIntegerMax;
+        }
+    }
+    return attributes;
+}
+
 - (CGSize)collectionViewContentSize {
     return self.totalContentSize;
+}
+
+- (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds {
+    return YES;
+}
+
+- (FSQCollectionViewAlignedLayoutInvalidationContext *)invalidationContextForBoundsChange:(CGRect)newBounds {
+    FSQCollectionViewAlignedLayoutInvalidationContext *context = (FSQCollectionViewAlignedLayoutInvalidationContext *)[super invalidationContextForBoundsChange:newBounds];
+    if (newBounds.size.width == self.collectionViewContentSize.width) {
+        context.invalidateAlignedLayoutAttributes = NO;
+    }
+    return context;
+}
+
++ (Class)invalidationContextClass {
+    return [FSQCollectionViewAlignedLayoutInvalidationContext class];
+}
+
+- (void)invalidateLayoutWithContext:(FSQCollectionViewAlignedLayoutInvalidationContext *)context {
+    [super invalidateLayoutWithContext:context];
+    if (context.invalidateAlignedLayoutAttributes) {
+        self.sectionsData = nil;
+    }
 }
 
 #pragma mark - Delegate Helpers -
@@ -539,6 +629,15 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
     }
     else {
         return self.defaultCellSize;
+    }
+}
+
+- (CGFloat)heightForHeaderInSection:(CGFloat)section {
+    if ([self.delegate respondsToSelector:@selector(collectionView:layout:referenceHeightForHeaderInSection:)]) {
+        return [self.delegate collectionView:self.collectionView layout:self referenceHeightForHeaderInSection:section];
+    }
+    else {
+        return 0.0f;
     }
 }
 

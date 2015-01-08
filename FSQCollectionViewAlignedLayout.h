@@ -39,6 +39,12 @@
 
 @class FSQCollectionViewAlignedLayoutSectionAttributes, FSQCollectionViewAlignedLayoutCellAttributes;
 
+@interface FSQCollectionViewAlignedLayoutInvalidationContext : UICollectionViewLayoutInvalidationContext
+
+@property (nonatomic) BOOL invalidateAlignedLayoutAttributes; // if set to NO, aligned layout will keep all layout information, effectively not invalidating - useful for a subclass which invalidates only a piece of itself
+
+@end
+
 @interface FSQCollectionViewAlignedLayout : UICollectionViewLayout <NSFastEnumeration>
 
 /**
@@ -98,6 +104,18 @@
                   layout:(FSQCollectionViewAlignedLayout *)collectionViewLayout
   sizeForItemAtIndexPath:(NSIndexPath *)indexPath
       remainingLineSpace:(CGFloat)remainingLineSpace;
+
+/**
+ *  Asks the delegate for the height of the header view in the specified section.
+ *  If you do not imeplement this method, or the height returned is 0, no header is added.
+ *
+ *  @param collectionView       The collection view object displaying the layout.
+ *  @param collectionViewLayout The layout object requesting the information.
+ *  @param section              The index of the section whose header size is being requested.
+ *
+ *  @return The height of the header. If you return a value of 0, no header is added.
+ */
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceHeightForHeaderInSection:(NSInteger)section;
 
 /**
  Used instead of defaultSectionAttributes if implemented.
