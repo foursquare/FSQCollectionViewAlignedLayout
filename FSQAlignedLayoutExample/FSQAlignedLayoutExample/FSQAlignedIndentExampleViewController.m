@@ -12,6 +12,7 @@
 
 @interface FSQExampleSectionData : NSObject
 @property (nonatomic) FSQCollectionViewHorizontalAlignment hAlignment;
+@property (nonatomic) NSString *headerString;
 @property (nonatomic) NSArray *cellData;
 @end
 
@@ -25,6 +26,28 @@
 @end
 
 @implementation FSQExampleCellData
+@end
+
+@interface FSQExampleHeaderView : UICollectionReusableView
+@property (nonatomic) UILabel *label;
+@end
+
+@implementation FSQExampleHeaderView
+
+- (instancetype)initWithFrame:(CGRect)frame {
+    if ((self = [super initWithFrame:frame])) {
+        self.backgroundColor = [UIColor colorWithWhite:0.96f alpha:1.0f];
+        UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(15.0f, 0, frame.size.width - 30.0f, frame.size.height)];
+        label.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight);
+        label.backgroundColor = [UIColor clearColor];
+        label.font = kMainFont;
+        label.numberOfLines = 1;
+        [self addSubview:label];
+        self.label = label;
+    }
+    return self;
+}
+
 @end
 
 @interface FSQExampleCell : UICollectionViewCell
@@ -72,7 +95,9 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     self.collectionView.backgroundColor = [UIColor whiteColor];
+    self.collectionView.alwaysBounceVertical = YES;
     [self.collectionView registerClass:[FSQExampleCell class] forCellWithReuseIdentifier:@"cell"];
+    [self.collectionView registerClass:[FSQExampleHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header"];
     
     CGRect frame = self.collectionView.frame;
     frame.origin.y += 20;
@@ -136,6 +161,22 @@
     return cell;
 }
 
+- (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceHeightForHeaderInSection:(NSInteger)section {
+    FSQExampleSectionData *sectionData = self.sectionData[section];
+    return (sectionData.headerString.length > 0) ? 30.0f : 0.0f;
+}
+
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
+    UICollectionReusableView *view = nil;
+    if (kind == UICollectionElementKindSectionHeader) {
+        FSQExampleSectionData *sectionData = self.sectionData[indexPath.section];
+        FSQExampleHeaderView *headerView = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"header" forIndexPath:indexPath];
+        headerView.label.text = sectionData.headerString;
+        view = headerView;
+    }
+    return view;
+}
+
 - (NSArray *)generateExampleData {
     // First section
     FSQExampleSectionData *sectionOne = [FSQExampleSectionData new];
@@ -148,6 +189,7 @@
     // Second section
     FSQExampleSectionData *sectionTwo = [FSQExampleSectionData new];
     sectionTwo.hAlignment = FSQCollectionViewHorizontalAlignmentLeft;
+    sectionTwo.headerString = @"Paul";
     
     FSQExampleCellData *sectionTwoAvatarCell = [FSQExampleCellData new];
     sectionTwoAvatarCell.backgroundColor = [UIColor redColor];
@@ -170,6 +212,7 @@
     // Third Section
     FSQExampleSectionData *sectionThree = [FSQExampleSectionData new];
     sectionThree.hAlignment = FSQCollectionViewHorizontalAlignmentLeft;
+    sectionThree.headerString = @"Jessica";
     
     FSQExampleCellData *sectionThreeAvatarCell = [FSQExampleCellData new];
     sectionThreeAvatarCell.backgroundColor = [UIColor blueColor];
