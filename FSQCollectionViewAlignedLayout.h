@@ -107,7 +107,7 @@
 
 /**
  *  Asks the delegate for the height of the header view in the specified section.
- *  If you do not imeplement this method, or the height returned is 0, no header is added.
+ *  If you do not implement this method, or the height returned is 0, no header is added.
  *
  *  @param collectionView       The collection view object displaying the layout.
  *  @param collectionViewLayout The layout object requesting the information.
