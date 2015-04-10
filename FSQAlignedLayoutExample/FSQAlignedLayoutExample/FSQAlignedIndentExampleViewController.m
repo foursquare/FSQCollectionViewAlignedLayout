@@ -80,8 +80,9 @@
 - (id)init
 {
     FSQCollectionViewAlignedLayout *alignedLayout = [FSQCollectionViewAlignedLayout new];
+    alignedLayout.headersShouldStick = NO;
     self = [super initWithCollectionViewLayout:alignedLayout];
-    
+
     if (self) {
         // Custom initialization
         _sectionData = [self generateExampleData];

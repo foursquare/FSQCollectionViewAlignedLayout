@@ -122,6 +122,7 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
     self.totalContentSize = CGSizeZero;
     self.sectionSpacing = 10.f;
     self.contentInsets = UIEdgeInsetsMake(5., 5., 5., 5.);
+    self.headersShouldStick = YES;
 }
 
 #pragma mark - Layout calculation -
@@ -574,21 +575,23 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
         if (sectionData.headerAttributes) {
             attributes = [sectionData.headerAttributes copy];
             
-            NSInteger section = indexPath.section;
-            NSInteger numberOfItemsInSection = [self.collectionView numberOfItemsInSection:section];
-            
-            NSIndexPath *firstCellIndexPath = [NSIndexPath indexPathForItem:0 inSection:section];
-            NSIndexPath *lastCellIndexPath = [NSIndexPath indexPathForItem:MAX(0, (numberOfItemsInSection - 1)) inSection:section];
-            
-            UICollectionViewLayoutAttributes *firstCellAttributes = [self layoutAttributesForItemAtIndexPath:firstCellIndexPath];
-            UICollectionViewLayoutAttributes *lastCellAttributes = [self layoutAttributesForItemAtIndexPath:lastCellIndexPath];
-            
-            CGFloat headerHeight = attributes.frame.size.height;
-            CGFloat minY = CGRectGetMinY(firstCellAttributes.frame) - headerHeight - self.contentInsets.top - self.defaultSectionAttributes.insets.top;
-            CGFloat maxY = CGRectGetMaxY(lastCellAttributes.frame) - headerHeight + self.contentInsets.bottom + self.defaultSectionAttributes.insets.bottom;
-            CGFloat yOffset = MIN(MAX(self.collectionView.contentOffset.y + self.collectionView.contentInset.top, minY), maxY);
-            attributes.frame = CGRectMake(0.0f, yOffset, self.collectionViewContentSize.width, headerHeight);
-            attributes.zIndex = NSIntegerMax;
+            if(self.headersShouldStick) {
+                NSInteger section = indexPath.section;
+                NSInteger numberOfItemsInSection = [self.collectionView numberOfItemsInSection:section];
+                
+                NSIndexPath *firstCellIndexPath = [NSIndexPath indexPathForItem:0 inSection:section];
+                NSIndexPath *lastCellIndexPath = [NSIndexPath indexPathForItem:MAX(0, (numberOfItemsInSection - 1)) inSection:section];
+                
+                UICollectionViewLayoutAttributes *firstCellAttributes = [self layoutAttributesForItemAtIndexPath:firstCellIndexPath];
+                UICollectionViewLayoutAttributes *lastCellAttributes = [self layoutAttributesForItemAtIndexPath:lastCellIndexPath];
+                
+                CGFloat headerHeight = attributes.frame.size.height;
+                CGFloat minY = CGRectGetMinY(firstCellAttributes.frame) - headerHeight - self.contentInsets.top - self.defaultSectionAttributes.insets.top;
+                CGFloat maxY = CGRectGetMaxY(lastCellAttributes.frame) - headerHeight + self.contentInsets.bottom + self.defaultSectionAttributes.insets.bottom;
+                CGFloat yOffset = MIN(MAX(self.collectionView.contentOffset.y + self.collectionView.contentInset.top, minY), maxY);
+                attributes.frame = CGRectMake(0.0f, yOffset, self.collectionViewContentSize.width, headerHeight);
+                attributes.zIndex = NSIntegerMax;
+            }
         }
     }
     return attributes;
@@ -675,6 +678,22 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     return [self.sectionsData countByEnumeratingWithState:state objects:buffer count:len];
+}
+
+#pragma mark - Layout information helpers - 
+
+- (CGRect)frameForSection:(NSInteger)sectionIdx {
+    if(sectionIdx >= 0 && sectionIdx < self.sectionsData.count) {
+        CGRect sectionRect = [self.sectionsData[sectionIdx] sectionRect];
+        // add padding only if the section has some content
+        if(sectionRect.size.height > 0.0) {
+            sectionRect.size.height += _sectionSpacing * 2.0;
+        }
+        return sectionRect;
+    }
+    else {
+        return CGRectZero;
+    }
 }
 
 @end
