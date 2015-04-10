@@ -80,6 +80,16 @@
  */
 @property (nonatomic) UIEdgeInsets contentInsets;
 
+/**
+ If YES, header views will behave like those in UITableView. Defaults to YES
+ */
+@property (nonatomic) BOOL headersShouldStick; // default = YES
+
+/**
+ Returns the frame for the section indentified by sectionIdx, or CGRectZero if sectionIdx is out of range.
+ */
+- (CGRect)frameForSection:(NSInteger)sectionIdx;
+
 @end
 
 
