@@ -80,6 +80,20 @@
  */
 @property (nonatomic) UIEdgeInsets contentInsets;
 
+/**
+ Determines if the current section's header is pinned to the top of the collection view.
+ 
+ Defaults to YES.
+ 
+ @note This is similar to the behavior observed in UITableView's with the style UITableViewStylePlain.
+ */
+@property (nonatomic) BOOL shouldPinSectionHeadersToTop;
+
+/**
+ Returns the frame for the section indentified by sectionIdx, or CGRectZero if sectionIdx is out of range.
+ */
+- (CGRect)contentFrameForSection:(NSInteger)section;
+
 @end
 
 
