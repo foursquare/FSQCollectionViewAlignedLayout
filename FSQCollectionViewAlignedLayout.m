@@ -174,10 +174,14 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
                 UICollectionViewLayoutAttributes *attributes = [UICollectionViewLayoutAttributes layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader withIndexPath:indexPath];
                 attributes.frame = CGRectMake(0.0f, totalSizeOfContent.height, totalSizeOfContent.width, headerHeight);
                 sectionData.headerAttributes = attributes;
+                totalSizeOfSection.width = totalSizeOfContent.width;
                 totalSizeOfSection.height += headerHeight;
             }
             
-            totalSizeOfSection.height += sectionAttributes.insets.top;
+            BOOL hasContent = (numberOfCellsInSection != 0);
+            if (hasContent) {
+                totalSizeOfSection.height += sectionAttributes.insets.top;
+            }
             
             BOOL insertLineBreak = NO;
             for (NSUInteger cellIndex = 0; cellIndex < numberOfCellsInSection + 1; cellIndex++) {
@@ -353,11 +357,13 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
                 }
             }
             
-            totalSizeOfSection.height += sectionAttributes.insets.bottom;
+            if (hasContent) {
+                totalSizeOfSection.height += sectionAttributes.insets.bottom;
+            }
             
-            sectionData.sectionRect = CGRectMake(leftEdgeOfSection,
+            sectionData.sectionRect = CGRectMake(0.0,
                                                  totalSizeOfContent.height,
-                                                 totalSizeOfSection.width,
+                                                 totalSizeOfContent.width,
                                                  totalSizeOfSection.height);
             [self.sectionsData addObject:sectionData];
             totalSizeOfContent.height += totalSizeOfSection.height;
@@ -492,45 +498,50 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
     
     CGRect contentRect = CGRectMake(0, 0, _totalContentSize.width, _totalContentSize.height);
     
+    void (^addSectionDataLayoutAttributes)(FSQCollectionViewAlignedLayoutSectionData *, NSInteger) = ^(FSQCollectionViewAlignedLayoutSectionData *sectionData, NSInteger index) {
+        UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:index]];
+        if (attributes) {
+            [matchingLayoutAttributes addObject:attributes];
+        }
+        
+        for (UICollectionViewLayoutAttributes *cellAttributes in sectionData) {
+            if (CGRectIntersectsRect(targetRect, cellAttributes.frame)) {
+                [matchingLayoutAttributes addObject:[cellAttributes copy]];
+            }
+        }
+    };
+    
+    void (^addLayoutAttributes)(BOOL, BOOL (^)(FSQCollectionViewAlignedLayoutSectionData *)) = ^(BOOL reverse, BOOL (^breakCondition)(FSQCollectionViewAlignedLayoutSectionData *)) {
+        NSEnumerationOptions options = (reverse) ? NSEnumerationReverse : 0;
+        [self.sectionsData enumerateObjectsWithOptions:options usingBlock:^(FSQCollectionViewAlignedLayoutSectionData *sectionData, NSUInteger idx, BOOL *stop) {
+            if (breakCondition && breakCondition(sectionData)) {
+                *stop = YES;
+                return;
+            }
+            
+            addSectionDataLayoutAttributes(sectionData, idx);
+        }];
+    };
+    
     if (!CGRectIntersectsRect(targetRect, contentRect)) {
         // Outside our bounds, so return nil!
         return nil;
     }
     else if (CGRectContainsRect(targetRect, contentRect)) {
         // Just return everything!
-        for (FSQCollectionViewAlignedLayoutSectionData *sectionData in self.sectionsData) {
-            for (UICollectionViewLayoutAttributes *cellAttributes in sectionData) {
-                [matchingLayoutAttributes addObject:[cellAttributes copy]];
-            }
-        }
+        addLayoutAttributes(NO, nil);
     }
     else if (CGRectGetMinY(targetRect) <= 0.) {
         // Just start at the beginning and go up until it doesn't intersect
-        for (FSQCollectionViewAlignedLayoutSectionData *sectionData in self.sectionsData) {
-            if (!CGRectIntersectsRect(targetRect, sectionData.sectionRect)) {
-                break;
-            }
-            
-            for (UICollectionViewLayoutAttributes *cellAttributes in sectionData) {
-                if (CGRectIntersectsRect(targetRect, cellAttributes.frame)) {
-                    [matchingLayoutAttributes addObject:[cellAttributes copy]];
-                }
-            }
-        }
+        addLayoutAttributes(NO, ^BOOL (FSQCollectionViewAlignedLayoutSectionData *sectionData) {
+            return !CGRectIntersectsRect(targetRect, sectionData.sectionRect);
+        });
     }
     else if (CGRectGetMaxY(targetRect) >= _totalContentSize.height) {
         // Just start at the end and go down until it doenst intersect
-        for (FSQCollectionViewAlignedLayoutSectionData *sectionData in [self.sectionsData reverseObjectEnumerator]) {
-            if (!CGRectIntersectsRect(targetRect, sectionData.sectionRect)) {
-                break;
-            }
-            
-            for (UICollectionViewLayoutAttributes *cellAttributes in sectionData) {
-                if (CGRectIntersectsRect(targetRect, cellAttributes.frame)) {
-                    [matchingLayoutAttributes addObject:[cellAttributes copy]];
-                }
-            }
-        }
+        addLayoutAttributes(YES, ^BOOL (FSQCollectionViewAlignedLayoutSectionData *sectionData) {
+            return !CGRectIntersectsRect(targetRect, sectionData.sectionRect);
+        });
     }
     else {
         // Do a double binary search to figure out the range of sections that intersect the rect
@@ -538,25 +549,8 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
         
         if ([self.sectionsData count] > 0) {
             [self.sectionsData enumerateObjectsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:sectionRange] options:0 usingBlock:^(FSQCollectionViewAlignedLayoutSectionData *sectionData, NSUInteger idx, BOOL *stop) {
-                
-                for (UICollectionViewLayoutAttributes *cellAttributes in sectionData) {
-                    if (CGRectIntersectsRect(cellAttributes.frame, targetRect)) {
-                        [matchingLayoutAttributes addObject:[cellAttributes copy]];
-                    }
-                }
+                addSectionDataLayoutAttributes(sectionData, idx);
             }];
-        }
-    }
-    
-    NSIndexPath *firstIndexPath = [[matchingLayoutAttributes firstObject] indexPath];
-    NSIndexPath *lastIndexPath = [[matchingLayoutAttributes lastObject] indexPath];
-    
-    if (firstIndexPath && lastIndexPath) {
-        for (NSInteger section = firstIndexPath.section; section <= lastIndexPath.section; ++section) {
-            UICollectionViewLayoutAttributes *attributes = [self layoutAttributesForSupplementaryViewOfKind:UICollectionElementKindSectionHeader atIndexPath:[NSIndexPath indexPathForItem:0 inSection:section]];
-            if (attributes) {
-                [matchingLayoutAttributes addObject:attributes];
-            }
         }
     }
     
@@ -583,12 +577,14 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
             UICollectionViewLayoutAttributes *firstCellAttributes = [self layoutAttributesForItemAtIndexPath:firstCellIndexPath];
             UICollectionViewLayoutAttributes *lastCellAttributes = [self layoutAttributesForItemAtIndexPath:lastCellIndexPath];
             
-            CGFloat headerHeight = attributes.frame.size.height;
-            CGFloat minY = CGRectGetMinY(firstCellAttributes.frame) - headerHeight - self.contentInsets.top - self.defaultSectionAttributes.insets.top;
-            CGFloat maxY = CGRectGetMaxY(lastCellAttributes.frame) - headerHeight + self.contentInsets.bottom + self.defaultSectionAttributes.insets.bottom;
-            CGFloat yOffset = MIN(MAX(self.collectionView.contentOffset.y + self.collectionView.contentInset.top, minY), maxY);
-            attributes.frame = CGRectMake(0.0f, yOffset, self.collectionViewContentSize.width, headerHeight);
-            attributes.zIndex = NSIntegerMax;
+            if (firstCellAttributes && lastCellAttributes) {
+                CGFloat headerHeight = attributes.frame.size.height;
+                CGFloat minY = CGRectGetMinY(sectionData.sectionRect);
+                CGFloat maxY = CGRectGetMaxY(sectionData.sectionRect) - headerHeight;
+                CGFloat yOffset = MIN(MAX(self.collectionView.contentOffset.y + self.collectionView.contentInset.top, minY), maxY);
+                attributes.frame = CGRectMake(0.0f, yOffset, self.collectionViewContentSize.width, headerHeight);
+                attributes.zIndex = NSIntegerMax;
+            }
         }
     }
     return attributes;
