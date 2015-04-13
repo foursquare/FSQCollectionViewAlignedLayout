@@ -138,7 +138,9 @@ The layout has the following top level properties for customizing the entire col
 
 **UIEdgeInsets contentInsets** — This is the spacing in points around all four edges of the collection view content. The bounding box is a rectangle that exactly encompasses every section in the collection. If not set, the default value is 5 point spacing for all edges.
 
+**BOOL shouldPinSectionHeadersToTop** — This controls whether the current top-most section's header gets pinned to the top of the view, similar to how UITableView works when using UITableViewStylePlain. The default value is YES.
+
 
 Contributors
 ============
-FSQCollectionViewAlignedLayout was initially developed by Foursquare Labs for internal use. It was originally written and is currently maintained by Brian Dorfman ([@bdorfman](https://twitter.com/bdorfman)).
+FSQCollectionViewAlignedLayout was initially developed by Foursquare Labs for internal use. It was originally written by Brian Dorfman ([@bdorfman](https://twitter.com/bdorfman)) and is currently maintained by Brian Dorfman and [Cameron Mulhern](http://www.cameronmulhern.com).
