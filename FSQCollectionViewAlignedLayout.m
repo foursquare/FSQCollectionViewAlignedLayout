@@ -679,7 +679,7 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
 #pragma mark - Layout information helpers - 
 
 - (CGRect)contentFrameForSection:(NSInteger)section {
-    return [self.sectionsData[section] sectionRect];
+    return (section < self.sectionsData.count) ? [self.sectionsData[section] sectionRect] : CGRectZero;
 }
 
 @end
