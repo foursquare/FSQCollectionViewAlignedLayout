@@ -80,6 +80,8 @@
 - (id)init
 {
     FSQCollectionViewAlignedLayout *alignedLayout = [FSQCollectionViewAlignedLayout new];
+    alignedLayout.sectionSpacing = 0.0;
+    alignedLayout.contentInsets = UIEdgeInsetsZero;
     self = [super initWithCollectionViewLayout:alignedLayout];
     
     if (self) {
@@ -98,10 +100,13 @@
     self.collectionView.alwaysBounceVertical = YES;
     [self.collectionView registerClass:[FSQExampleCell class] forCellWithReuseIdentifier:@"cell"];
     [self.collectionView registerClass:[FSQExampleHeaderView class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:@"header"];
-    
-    CGRect frame = self.collectionView.frame;
-    frame.origin.y += 20;
-    self.collectionView.frame = frame;
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    self.collectionView.frame = CGRectMake(0.0, 20.0, self.view.frame.size.width, self.view.frame.size.height - 20.0);
+    self.collectionView.contentInset = UIEdgeInsetsMake(0.0, 0.0, self.bottomLayoutGuide.length, 0.0);
+    self.collectionView.scrollIndicatorInsets = UIEdgeInsetsMake(0.0, 0.0, self.bottomLayoutGuide.length, 0.0);
 }
 
 - (FSQCollectionViewAlignedLayoutCellAttributes *)collectionView:(UICollectionView *)collectionView 
@@ -121,7 +126,10 @@
     FSQExampleSectionData *sectionData = self.sectionData[sectionIndex];
     
     return [FSQCollectionViewAlignedLayoutSectionAttributes withHorizontalAlignment:sectionData.hAlignment 
-                                                                  verticalAlignment:FSQCollectionViewVerticalAlignmentTop];
+                                                                  verticalAlignment:FSQCollectionViewVerticalAlignmentTop
+                                                                        itemSpacing:5.0
+                                                                        lineSpacing:5.0
+                                                                             insets:UIEdgeInsetsMake(5.0, 5.0, 5.0, 5.0)];
 }
 
 - (CGSize)collectionView:(UICollectionView *)collectionView 
