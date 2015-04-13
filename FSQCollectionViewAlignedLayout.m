@@ -122,6 +122,7 @@ CGFloat UIEdgeInsetsVerticalInset_fsq(UIEdgeInsets insets) {
     self.totalContentSize = CGSizeZero;
     self.sectionSpacing = 10.f;
     self.contentInsets = UIEdgeInsetsMake(5., 5., 5., 5.);
+    self.shouldPinSectionHeadersToTop = YES;
 }
 
 #pragma mark - Layout calculation -
@@ -568,22 +569,24 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
         if (sectionData.headerAttributes) {
             attributes = [sectionData.headerAttributes copy];
             
-            NSInteger section = indexPath.section;
-            NSInteger numberOfItemsInSection = [self.collectionView numberOfItemsInSection:section];
-            
-            NSIndexPath *firstCellIndexPath = [NSIndexPath indexPathForItem:0 inSection:section];
-            NSIndexPath *lastCellIndexPath = [NSIndexPath indexPathForItem:MAX(0, (numberOfItemsInSection - 1)) inSection:section];
-            
-            UICollectionViewLayoutAttributes *firstCellAttributes = [self layoutAttributesForItemAtIndexPath:firstCellIndexPath];
-            UICollectionViewLayoutAttributes *lastCellAttributes = [self layoutAttributesForItemAtIndexPath:lastCellIndexPath];
-            
-            if (firstCellAttributes && lastCellAttributes) {
-                CGFloat headerHeight = attributes.frame.size.height;
-                CGFloat minY = CGRectGetMinY(sectionData.sectionRect);
-                CGFloat maxY = CGRectGetMaxY(sectionData.sectionRect) - headerHeight;
-                CGFloat yOffset = MIN(MAX(self.collectionView.contentOffset.y + self.collectionView.contentInset.top, minY), maxY);
-                attributes.frame = CGRectMake(0.0f, yOffset, self.collectionViewContentSize.width, headerHeight);
-                attributes.zIndex = NSIntegerMax;
+            if (self.shouldPinSectionHeadersToTop) {
+                NSInteger section = indexPath.section;
+                NSInteger numberOfItemsInSection = [self.collectionView numberOfItemsInSection:section];
+                
+                NSIndexPath *firstCellIndexPath = [NSIndexPath indexPathForItem:0 inSection:section];
+                NSIndexPath *lastCellIndexPath = [NSIndexPath indexPathForItem:MAX(0, (numberOfItemsInSection - 1)) inSection:section];
+                
+                UICollectionViewLayoutAttributes *firstCellAttributes = [self layoutAttributesForItemAtIndexPath:firstCellIndexPath];
+                UICollectionViewLayoutAttributes *lastCellAttributes = [self layoutAttributesForItemAtIndexPath:lastCellIndexPath];
+                
+                if (firstCellAttributes && lastCellAttributes) {
+                    CGFloat headerHeight = attributes.frame.size.height;
+                    CGFloat minY = CGRectGetMinY(sectionData.sectionRect);
+                    CGFloat maxY = CGRectGetMaxY(sectionData.sectionRect) - headerHeight;
+                    CGFloat yOffset = MIN(MAX(self.collectionView.contentOffset.y + self.collectionView.contentInset.top, minY), maxY);
+                    attributes.frame = CGRectMake(0.0f, yOffset, self.collectionViewContentSize.width, headerHeight);
+                    attributes.zIndex = NSIntegerMax;
+                }
             }
         }
     }
@@ -671,6 +674,12 @@ NSUInteger boundIndexWithComparisonBlock(SearchComparisonBlock comparisonBlock, 
 
 - (NSUInteger)countByEnumeratingWithState:(NSFastEnumerationState *)state objects:(__unsafe_unretained id [])buffer count:(NSUInteger)len {
     return [self.sectionsData countByEnumeratingWithState:state objects:buffer count:len];
+}
+
+#pragma mark - Layout information helpers - 
+
+- (CGRect)contentFrameForSection:(NSInteger)section {
+    return (section < self.sectionsData.count) ? [self.sectionsData[section] sectionRect] : CGRectZero;
 }
 
 @end

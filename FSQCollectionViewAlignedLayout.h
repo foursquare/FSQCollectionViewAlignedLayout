@@ -80,6 +80,22 @@
  */
 @property (nonatomic) UIEdgeInsets contentInsets;
 
+/**
+ Determines if the current section's header is pinned to the top of the collection view.
+ 
+ Defaults to YES.
+ 
+ @note This is similar to the behavior observed in UITableView's with the style UITableViewStylePlain.
+ */
+@property (nonatomic) BOOL shouldPinSectionHeadersToTop;
+
+/**
+ @param section The section of the collection view.
+ 
+ @return The frame for the section, or CGRectZero if the section is out of range.
+ */
+- (CGRect)contentFrameForSection:(NSInteger)section;
+
 @end
 
 
@@ -106,14 +122,14 @@
       remainingLineSpace:(CGFloat)remainingLineSpace;
 
 /**
- *  Asks the delegate for the height of the header view in the specified section.
- *  If you do not implement this method, or the height returned is 0, no header is added.
- *
- *  @param collectionView       The collection view object displaying the layout.
- *  @param collectionViewLayout The layout object requesting the information.
- *  @param section              The index of the section whose header size is being requested.
- *
- *  @return The height of the header. If you return a value of 0, no header is added.
+ Asks the delegate for the height of the header view in the specified section.
+ If you do not implement this method, or the height returned is 0, no header is added.
+ 
+ @param collectionView       The collection view object displaying the layout.
+ @param collectionViewLayout The layout object requesting the information.
+ @param section              The index of the section whose header size is being requested.
+ 
+ @return The height of the header. If you return a value of 0, no header is added.
  */
 - (CGFloat)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout referenceHeightForHeaderInSection:(NSInteger)section;
 
