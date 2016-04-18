@@ -143,4 +143,4 @@ The layout has the following top level properties for customizing the entire col
 
 Contributors
 ============
-FSQCollectionViewAlignedLayout was initially developed by Foursquare Labs for internal use. It was originally written by Brian Dorfman ([@bdorfman](https://twitter.com/bdorfman)) and is currently maintained by Brian Dorfman and [Cameron Mulhern](http://www.cameronmulhern.com).
+FSQCollectionViewAlignedLayout was initially developed by Foursquare Labs for internal use. It was originally written by Brian Dorfman ([@bdorfman](https://twitter.com/bdorfman)) and [Cameron Mulhern](http://www.cameronmulhern.com), and is currently maintained by Sam Grossberg ([@samgro](https://github.com/samgro)).
